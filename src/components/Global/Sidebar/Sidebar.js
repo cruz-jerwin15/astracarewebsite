@@ -57,22 +57,22 @@ function Sidebar() {
         </li>
 
         <li className="nav-item">
+            <a className="nav-link" href="/courses">
+                <i className="fas fa-fw fa-user-graduate"></i>
+                <span>Courses</span></a>
+        </li>
+        <li className="nav-item">
+            <a className="nav-link" href="/sections">
+                <i className="fas fa-fw fa-puzzle-piece"></i>
+                <span>Sections</span></a>
+        </li>
+        <li className="nav-item">
             <a className="nav-link" href="/">
                 <i className="fas fa-fw fa-building"></i>
                 <span>Buildings</span></a>
         </li>
 
-        <li className="nav-item">
-            <a className="nav-link" href="/">
-                <i className="fas fa-fw fa-user-graduate"></i>
-                <span>Courses</span></a>
-        </li>
-
-        <li className="nav-item">
-            <a className="nav-link" href="/">
-                <i className="fas fa-fw fa-puzzle-piece"></i>
-                <span>Sections</span></a>
-        </li>
+      
 
         <hr className="sidebar-divider d-none d-md-block" />
 

@@ -1,43 +1,48 @@
 'use client'
 import React from 'react'
 import {useState, useEffect} from 'react'
-import AddDepartment from '../Department/AddDepartment'
-import UpdateDepartment from '../Department/UpdateDepartment'
-import { useGetDepartmentsQuery,useUpdateDepartmentsStatusMutation } from '../../../rtk/departmentApi';
+import AddCourse from '../Course/AddCourse'
+import UpdateCourse from '../Course/UpdateCourse'
+import { useGetCoursesQuery,useUpdateCoursesStatusMutation } from '../../../rtk/courseApi';
 import dateOnly from '../../../utils/getDate'
 import { toast} from 'react-toastify';
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; 
 
 
-function Department() {
+function Course() {
     const [filteredDepartments, setFilteredDepartments] = useState([]);
     const [process,setProcess] =useState('IDLE');
     const [searchby,setSearchBy] =useState('name');
     const [search,setSearch] =useState('');
     const [row,setRow] = useState(5);
     const [startrow,setStartRow] = useState(0);
-    const [deptid,setDeptId] = useState(0);
-    const {data:departments,isLoading,isError,isSuccess,error} = useGetDepartmentsQuery();
+    const [courseid,setCourseId] = useState(0);
+    const {data:courses,isLoading,isError,isSuccess,error} = useGetCoursesQuery();
+    
 
-     const [updateDepartmentStatus] = useUpdateDepartmentsStatusMutation();
+     const [updateCourseStatus] = useUpdateCoursesStatusMutation();
 
     const searchDepartment=()=>{
-        if (!departments) return;
+        if (!courses) return;
 
-        let results = departments;
+        let results = courses;
     
         if (searchby === 'name') {
-            results = departments.filter(dep =>
-                dep.department_name.toLowerCase().includes(search.toLowerCase())
+            results = courses.filter(ress =>
+                ress.course_name.toLowerCase().includes(search.toLowerCase())
             );
         } else if (searchby === 'date') {
-            results = departments.filter(dep =>
-                dateOnly(dep.date_added).includes(search)
+            results = courses.filter(ress =>
+                dateOnly(ress.date_added).includes(search)
+            );
+        }else if (searchby === 'department') {
+            results = courses.filter(ress =>
+                ress.department_name.toLowerCase().includes(search.toLowerCase())
             );
         }else{
-            results = departments.filter(dep =>
-                dep.description.toLowerCase().includes(search.toLowerCase())
+            results = courses.filter(ress =>
+                ress.description.toLowerCase().includes(search.toLowerCase())
             );
             
         }
@@ -52,9 +57,9 @@ function Department() {
             customUI: ({ onClose }) => {
                 return (
                   <div className='card shadow' style={{ padding: '20px', borderRadius: '10px', backgroundColor: '#f8d7da' }}>
-                    <h1 className="text-secondary header-text">Remove Department</h1>
+                    <h1 className="text-secondary header-text">Remove Course</h1>
                     <p className="text-secondary normal-text">
-                      Are you sure to remove this department from Active status?
+                      Are you sure to remove this course from Active status?
                     </p>
                     <div className="w-100 d-flex justify-content-between">
                         <button
@@ -63,7 +68,7 @@ function Department() {
                         <button
                         className="btn btn-danger normal-text"
                         onClick={() => {
-                            submitDepartmentStatus(id,'REMOVED')
+                            submitCourseStatus(id,'REMOVED')
                             onClose();
                         }}
                         >
@@ -82,9 +87,9 @@ function Department() {
             customUI: ({ onClose }) => {
                 return (
                   <div className='card shadow' style={{ padding: '20px', borderRadius: '10px', backgroundColor: '#f8d7da' }}>
-                    <h1 className="text-secondary header-text">Retrieve Department</h1>
+                    <h1 className="text-secondary header-text">Retrieve Course</h1>
                     <p className="text-secondary normal-text">
-                      Are you sure to retrieve this department from Removed status?
+                      Are you sure to retrieve this course from Removed status?
                     </p>
                     <div className="w-100 d-flex justify-content-between">
                         <button
@@ -93,7 +98,7 @@ function Department() {
                         <button
                         className="btn btn-info normal-text"
                         onClick={() => {
-                            submitDepartmentStatus(id,'ACTIVE')
+                            submitCourseStatus(id,'ACTIVE')
                             onClose();
                         }}
                         >
@@ -107,18 +112,18 @@ function Department() {
           });
         
     }
-    const submitDepartmentStatus=(id,status)=>{
-        const department = {
+    const submitCourseStatus=(id,status)=>{
+        const course = {
             id:id,
             status:status
         }
-        updateDepartmentStatus(department)
+        updateCourseStatus(course)
         .unwrap()
         .then((res)=>{
             if(status=='ACTIVE'){
-                toast.success("Department retrieved successfully");
+                toast.success("Course retrieved successfully");
             }else{
-                toast.success("Department removed successfully");
+                toast.success("Course removed successfully");
             }
             
                     
@@ -128,10 +133,10 @@ function Department() {
         })
     }
     
-    const getDepartmentId =(id)=>{
+    const getCourseId =(id)=>{
         setProcess('UPDATE')
         console.log(id)
-        setDeptId(id)
+        setCourseId(id)
 }
 
     const whatProcess=(p)=>{
@@ -171,23 +176,23 @@ function Department() {
         console.log("Start Row",row)
     },[startrow]);
     useEffect(() => {
-        if (departments) {
-            setFilteredDepartments(departments);
+        if (courses) {
+            setFilteredDepartments(courses);
         }
-    }, [departments]);
+    }, [courses]);
   return (
     <>
 <div className="card shadow mb-4">
     <div className="card-header py-3 d-flex justify-content-between align-items-center">
-        <h6 className="m-0 font-weight-bold text-primary header-text">List of Department /
+        <h6 className="m-0 font-weight-bold text-primary header-text">List of Courses /
             {
                 process=='IDLE' ?
-                <span className="text-secondary"> Search Department</span>
+                <span className="text-secondary"> Search Course</span>
                 :
                 process=='ADD' ?
-                <span className="text-secondary"> Add Department</span>
+                <span className="text-secondary"> Add Course</span>
                 :
-                <span className="text-secondary"> Update Department</span>
+                <span className="text-secondary"> Update Course</span>
             }
         </h6>
         {
@@ -226,6 +231,7 @@ function Department() {
                         className="form-control normal-text" >
                         <option value="name"> Search by Name</option>
                         <option value="date">Search by Date Added</option>
+                        <option value="department">Search by Department</option>
                         <option value="description">Search by Description</option>
                     
                         </select>
@@ -249,7 +255,7 @@ function Department() {
                 > Search</button>
                 <button
                 onClick={() => {
-                    setFilteredDepartments(departments);
+                    setFilteredDepartments(courses);
                     setSearch('');
                     setStartRow(0);
                     setRow(5);
@@ -263,10 +269,10 @@ function Department() {
             :
             // Adding Data
             process=='ADD' ?
-            <AddDepartment/>
+            <AddCourse/>
             :
             // Update
-            <UpdateDepartment departmentid={deptid}/>
+            <UpdateCourse courseid={courseid}/>
         }
 
            
@@ -291,8 +297,9 @@ function Department() {
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th>Department Name</th>
+                        <th>Course Name</th>
                         <th>Description</th>
+                        <th>Department</th>
                         <th>Date Added</th>
                         <th>Status</th>
                         <th>Action</th>
@@ -305,14 +312,15 @@ function Department() {
                             index>=startrow && index<row ?
                             <tr key={index}>
                                 <td>{index + 1}</td>
-                                <td>{item.department_name}</td>
+                                <td>{item.course_name}</td>
                                 <td>{item.description}</td>
+                                <td>{item.department_name}</td>
                                 <td>{dateOnly(item.date_added)}</td>
                                 <td>{item.status}</td>
                                 <td className="d-flex justify-content-center" style={style}>
                                     <button 
                                     className="btn btn-warning btn-sm"
-                                    onClick={()=>getDepartmentId(item.id)}
+                                    onClick={()=>getCourseId(item.id)}
                                     >
                                         <i className="fas fa-fw fa-edit"></i>
                                     </button>
@@ -402,4 +410,4 @@ function Department() {
   )
 }
 
-export default Department
+export default Course

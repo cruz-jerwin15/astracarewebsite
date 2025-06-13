@@ -1,60 +1,60 @@
 'use client'
 import React from 'react'
 import {useState, useEffect} from 'react'
-import AddDepartment from '../Department/AddDepartment'
-import UpdateDepartment from '../Department/UpdateDepartment'
-import { useGetDepartmentsQuery,useUpdateDepartmentsStatusMutation } from '../../../rtk/departmentApi';
+import AddSection from '../Section/AddSection'
+import UpdateSection from '../Section/UpdateSection'
+import { useGetSectionsQuery,useUpdateSectionsStatusMutation } from '../../../rtk/sectionApi';
 import dateOnly from '../../../utils/getDate'
 import { toast} from 'react-toastify';
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; 
 
 
-function Department() {
-    const [filteredDepartments, setFilteredDepartments] = useState([]);
+function Section() {
+    const [filteredResult, setFilteredResult] = useState([]);
     const [process,setProcess] =useState('IDLE');
     const [searchby,setSearchBy] =useState('name');
     const [search,setSearch] =useState('');
     const [row,setRow] = useState(5);
     const [startrow,setStartRow] = useState(0);
-    const [deptid,setDeptId] = useState(0);
-    const {data:departments,isLoading,isError,isSuccess,error} = useGetDepartmentsQuery();
+    const [sectionid,setSectionId] = useState(0);
+    const {data:sections,isLoading,isError,isSuccess,error} = useGetSectionsQuery();
+    
 
-     const [updateDepartmentStatus] = useUpdateDepartmentsStatusMutation();
+     const [updateSectionStatus] = useUpdateSectionsStatusMutation();
 
-    const searchDepartment=()=>{
-        if (!departments) return;
+    const searchSection=()=>{
+        if (!sections) return;
 
-        let results = departments;
+        let results = sections;
     
         if (searchby === 'name') {
-            results = departments.filter(dep =>
-                dep.department_name.toLowerCase().includes(search.toLowerCase())
+            results = sections.filter(ress =>
+                ress.section_name.toLowerCase().includes(search.toLowerCase())
             );
         } else if (searchby === 'date') {
-            results = departments.filter(dep =>
-                dateOnly(dep.date_added).includes(search)
+            results = sections.filter(ress =>
+                dateOnly(ress.date_added).includes(search)
             );
-        }else{
-            results = departments.filter(dep =>
-                dep.description.toLowerCase().includes(search.toLowerCase())
+        }else if (searchby === 'course') {
+            results = sections.filter(ress =>
+                ress.course_name.toLowerCase().includes(search.toLowerCase())
             );
-            
         }
     
-        setFilteredDepartments(results);
+        setFilteredResult(results);
         setStartRow(0);
         setRow(5); // Reset pagination
     } 
     
-    const getRemoveDepartmentId=(id)=>{
+    const getRemoveSectionId=(id)=>{
         confirmAlert({
             customUI: ({ onClose }) => {
                 return (
                   <div className='card shadow' style={{ padding: '20px', borderRadius: '10px', backgroundColor: '#f8d7da' }}>
-                    <h1 className="text-secondary header-text">Remove Department</h1>
+                    <h1 className="text-secondary header-text">Remove Section</h1>
                     <p className="text-secondary normal-text">
-                      Are you sure to remove this department from Active status?
+                      Are you sure to remove this section from Active status?
                     </p>
                     <div className="w-100 d-flex justify-content-between">
                         <button
@@ -63,7 +63,7 @@ function Department() {
                         <button
                         className="btn btn-danger normal-text"
                         onClick={() => {
-                            submitDepartmentStatus(id,'REMOVED')
+                            submitSectionStatus(id,'REMOVED')
                             onClose();
                         }}
                         >
@@ -77,14 +77,14 @@ function Department() {
           });
         
     }
-    const getRetrieveDepartmentId=(id)=>{
+    const getRetrieveSectionId=(id)=>{
         confirmAlert({
             customUI: ({ onClose }) => {
                 return (
                   <div className='card shadow' style={{ padding: '20px', borderRadius: '10px', backgroundColor: '#f8d7da' }}>
-                    <h1 className="text-secondary header-text">Retrieve Department</h1>
+                    <h1 className="text-secondary header-text">Retrieve Section</h1>
                     <p className="text-secondary normal-text">
-                      Are you sure to retrieve this department from Removed status?
+                      Are you sure to retrieve this section from Removed status?
                     </p>
                     <div className="w-100 d-flex justify-content-between">
                         <button
@@ -93,7 +93,7 @@ function Department() {
                         <button
                         className="btn btn-info normal-text"
                         onClick={() => {
-                            submitDepartmentStatus(id,'ACTIVE')
+                            submitSectionStatus(id,'ACTIVE')
                             onClose();
                         }}
                         >
@@ -107,18 +107,18 @@ function Department() {
           });
         
     }
-    const submitDepartmentStatus=(id,status)=>{
-        const department = {
+    const submitSectionStatus=(id,status)=>{
+        const section = {
             id:id,
             status:status
         }
-        updateDepartmentStatus(department)
+        updateSectionStatus(section)
         .unwrap()
         .then((res)=>{
             if(status=='ACTIVE'){
-                toast.success("Department retrieved successfully");
+                toast.success("Section retrieved successfully");
             }else{
-                toast.success("Department removed successfully");
+                toast.success("Section removed successfully");
             }
             
                     
@@ -128,10 +128,9 @@ function Department() {
         })
     }
     
-    const getDepartmentId =(id)=>{
+    const getSectionId =(id)=>{
         setProcess('UPDATE')
-        console.log(id)
-        setDeptId(id)
+        setSectionId(id)
 }
 
     const whatProcess=(p)=>{
@@ -157,8 +156,8 @@ function Department() {
         gap:"1px"
     }
    
-    if(filteredDepartments){
-        let len = Math.ceil(filteredDepartments.length / 5);
+    if(filteredResult){
+        let len = Math.ceil(filteredResult.length / 5);
         var pageArray = [];
         for (var i = 0; i < len; i++) {
             pageArray.push(i);
@@ -168,26 +167,26 @@ function Department() {
  
    
     useEffect(() => {
-        console.log("Start Row",row)
+  
     },[startrow]);
     useEffect(() => {
-        if (departments) {
-            setFilteredDepartments(departments);
+        if (sections) {
+            setFilteredResult(sections);
         }
-    }, [departments]);
+    }, [sections]);
   return (
     <>
 <div className="card shadow mb-4">
     <div className="card-header py-3 d-flex justify-content-between align-items-center">
-        <h6 className="m-0 font-weight-bold text-primary header-text">List of Department /
+        <h6 className="m-0 font-weight-bold text-primary header-text">List of Sections /
             {
                 process=='IDLE' ?
-                <span className="text-secondary"> Search Department</span>
+                <span className="text-secondary"> Search Section</span>
                 :
                 process=='ADD' ?
-                <span className="text-secondary"> Add Department</span>
+                <span className="text-secondary"> Add Section</span>
                 :
-                <span className="text-secondary"> Update Department</span>
+                <span className="text-secondary"> Update Section</span>
             }
         </h6>
         {
@@ -224,9 +223,9 @@ function Department() {
                         onChange={(e)=>setSearchBy(e.target.value)}
                         value={searchby}
                         className="form-control normal-text" >
-                        <option value="name"> Search by Name</option>
+                        <option value="name"> Search by Section Name</option>
                         <option value="date">Search by Date Added</option>
-                        <option value="description">Search by Description</option>
+                        <option value="course">Search by Course Name</option>
                     
                         </select>
                     </div>
@@ -244,12 +243,12 @@ function Department() {
                 <div className="col-md-3"> 
             
                 <button 
-                onClick={()=>searchDepartment()}
+                onClick={()=>searchSection()}
                 className="btn btn-primary btn-sm btn-header normal-text"
                 > Search</button>
                 <button
                 onClick={() => {
-                    setFilteredDepartments(departments);
+                    setFilteredResult(sections);
                     setSearch('');
                     setStartRow(0);
                     setRow(5);
@@ -263,10 +262,10 @@ function Department() {
             :
             // Adding Data
             process=='ADD' ?
-            <AddDepartment/>
+            <AddSection/>
             :
             // Update
-            <UpdateDepartment departmentid={deptid}/>
+            <UpdateSection sectionid={sectionid}/>
         }
 
            
@@ -291,8 +290,8 @@ function Department() {
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th>Department Name</th>
-                        <th>Description</th>
+                        <th>Section Name</th>
+                        <th>Course Name</th>
                         <th>Date Added</th>
                         <th>Status</th>
                         <th>Action</th>
@@ -301,18 +300,18 @@ function Department() {
                 </thead>
                 <tbody>
                     {
-                        filteredDepartments.map((item, index) => (
+                        filteredResult.map((item, index) => (
                             index>=startrow && index<row ?
                             <tr key={index}>
                                 <td>{index + 1}</td>
-                                <td>{item.department_name}</td>
-                                <td>{item.description}</td>
+                                <td>{item.section_name}</td>
+                                <td>{item.course_name}</td>
                                 <td>{dateOnly(item.date_added)}</td>
                                 <td>{item.status}</td>
                                 <td className="d-flex justify-content-center" style={style}>
                                     <button 
                                     className="btn btn-warning btn-sm"
-                                    onClick={()=>getDepartmentId(item.id)}
+                                    onClick={()=>getSectionId(item.id)}
                                     >
                                         <i className="fas fa-fw fa-edit"></i>
                                     </button>
@@ -320,14 +319,14 @@ function Department() {
                                         item.status=="ACTIVE" ?
                                             <button 
                                             className="btn btn-danger btn-sm"
-                                            onClick={()=>getRemoveDepartmentId(item.id)}
+                                            onClick={()=>getRemoveSectionId(item.id)}
                                             >
                                                 <i className="fas fa-fw fa-trash"></i>
                                             </button>
                                         :
                                         <button 
                                         className="btn btn-info btn-sm"
-                                        onClick={()=>getRetrieveDepartmentId(item.id)}
+                                        onClick={()=>getRetrieveSectionId(item.id)}
                                         >
                                             <i className="fas fa-fw fa-sync"></i>
                                         </button>
@@ -347,7 +346,7 @@ function Department() {
             <div className="w-100 d-flex justify-content-end border-1">
                 <div className="btn-group " role="group" aria-label="Basic example" >
                         {
-                        filteredDepartments ?
+                        filteredResult ?
                         <>
                          <button 
                         type="button" 
@@ -378,7 +377,7 @@ function Department() {
                         type="button" 
                         className="btn btn-primary "
                         onClick={()=>addRows()}
-                        disabled={startrow+5 >= filteredDepartments.length}
+                        disabled={startrow+5 >= filteredResult.length}
                         >
                             <i className="fas fa-caret-right normal-text"></i>
                         </button>
@@ -402,4 +401,4 @@ function Department() {
   )
 }
 
-export default Department
+export default Section
