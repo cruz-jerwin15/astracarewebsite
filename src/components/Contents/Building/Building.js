@@ -1,60 +1,60 @@
 'use client'
 import React from 'react'
 import {useState, useEffect} from 'react'
-import AddDepartment from '../Department/AddDepartment'
-import UpdateDepartment from '../Department/UpdateDepartment'
-import { useGetDepartmentsQuery,useUpdateDepartmentsStatusMutation } from '../../../rtk/departmentApi';
+import AddBuilding from '../Building/AddBuilding'
+import UpdateBuilding from '../Building/UpdateBuilding'
+import { useGetBuildingsQuery,useUpdateBuildingsStatusMutation } from '../../../rtk/buildingApi';
 import dateOnly from '../../../utils/getDate'
 import { toast} from 'react-toastify';
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; 
 
 
-function Department() {
-    const [filteredDepartments, setFilteredDepartments] = useState([]);
+function Building() {
+    const [filteredBuildings, setFilteredBuildings] = useState([]);
     const [process,setProcess] =useState('IDLE');
     const [searchby,setSearchBy] =useState('name');
     const [search,setSearch] =useState('');
     const [row,setRow] = useState(5);
     const [startrow,setStartRow] = useState(0);
     const [deptid,setDeptId] = useState(0);
-    const {data:departments,isLoading,isError,isSuccess,error} = useGetDepartmentsQuery();
+    const {data:buildings,isLoading,isError,isSuccess,error} = useGetBuildingsQuery();
 
-     const [updateDepartmentStatus] = useUpdateDepartmentsStatusMutation();
+     const [updateBuildingStatus] = useUpdateBuildingsStatusMutation();
 
-    const searchDepartment=()=>{
-        if (!departments) return;
+    const searchBuilding=()=>{
+        if (!buildings) return;
 
-        let results = departments;
+        let results = buildings;
     
         if (searchby === 'name') {
-            results = departments.filter(dep =>
-                dep.department_name.toLowerCase().includes(search.toLowerCase())
+            results = buildings.filter(dep =>
+                dep.building_name.toLowerCase().includes(search.toLowerCase())
             );
         } else if (searchby === 'date') {
-            results = departments.filter(dep =>
+            results = buildings.filter(dep =>
                 dateOnly(dep.date_added).includes(search)
             );
         }else{
-            results = departments.filter(dep =>
+            results = buildings.filter(dep =>
                 dep.description.toLowerCase().includes(search.toLowerCase())
             );
             
         }
     
-        setFilteredDepartments(results);
+        setFilteredBuildings(results);
         setStartRow(0);
         setRow(5); // Reset pagination
     } 
     
-    const getRemoveDepartmentId=(id)=>{
+    const getRemoveBuildingId=(id)=>{
         confirmAlert({
             customUI: ({ onClose }) => {
                 return (
                   <div className='card shadow' style={{ padding: '20px', borderRadius: '10px', backgroundColor: '#f8d7da' }}>
-                    <h1 className="text-secondary header-text">Remove Department</h1>
+                    <h1 className="text-secondary header-text">Remove Building</h1>
                     <p className="text-secondary normal-text">
-                      Are you sure to remove this department from Active status?
+                      Are you sure to remove this building from Active status?
                     </p>
                     <div className="w-100 d-flex justify-content-between">
                         <button
@@ -63,7 +63,7 @@ function Department() {
                         <button
                         className="btn btn-danger normal-text"
                         onClick={() => {
-                            submitDepartmentStatus(id,'REMOVED')
+                            submitBuildingStatus(id,'REMOVED')
                             onClose();
                         }}
                         >
@@ -77,14 +77,14 @@ function Department() {
           });
         
     }
-    const getRetrieveDepartmentId=(id)=>{
+    const getRetrieveBuildingId=(id)=>{
         confirmAlert({
             customUI: ({ onClose }) => {
                 return (
                   <div className='card shadow' style={{ padding: '20px', borderRadius: '10px', backgroundColor: '#f8d7da' }}>
-                    <h1 className="text-secondary header-text">Retrieve Department</h1>
+                    <h1 className="text-secondary header-text">Retrieve Building</h1>
                     <p className="text-secondary normal-text">
-                      Are you sure to retrieve this department from Removed status?
+                      Are you sure to retrieve this building from Removed status?
                     </p>
                     <div className="w-100 d-flex justify-content-between">
                         <button
@@ -93,7 +93,7 @@ function Department() {
                         <button
                         className="btn btn-info normal-text"
                         onClick={() => {
-                            submitDepartmentStatus(id,'ACTIVE')
+                            submitBuildingStatus(id,'ACTIVE')
                             onClose();
                         }}
                         >
@@ -107,18 +107,18 @@ function Department() {
           });
         
     }
-    const submitDepartmentStatus=(id,status)=>{
-        const department = {
+    const submitBuildingStatus=(id,status)=>{
+        const building = {
             id:id,
             status:status
         }
-        updateDepartmentStatus(department)
+        updateBuildingStatus(building)
         .unwrap()
         .then((res)=>{
             if(status=='ACTIVE'){
-                toast.success("Department retrieved successfully");
+                toast.success("Building retrieved successfully");
             }else{
-                toast.success("Department removed successfully");
+                toast.success("Building removed successfully");
             }
             
                     
@@ -128,7 +128,7 @@ function Department() {
         })
     }
     
-    const getDepartmentId =(id)=>{
+    const getBuildingId =(id)=>{
         setProcess('UPDATE')
         console.log(id)
         setDeptId(id)
@@ -157,8 +157,8 @@ function Department() {
         gap:"1px"
     }
    
-    if(filteredDepartments){
-        let len = Math.ceil(filteredDepartments.length / 5);
+    if(filteredBuildings){
+        let len = Math.ceil(filteredBuildings.length / 5);
         var pageArray = [];
         for (var i = 0; i < len; i++) {
             pageArray.push(i);
@@ -171,36 +171,29 @@ function Department() {
         console.log("Start Row",row)
     },[startrow]);
     useEffect(() => {
-        if (departments) {
-            setFilteredDepartments(departments);
+        if (buildings) {
+            setFilteredBuildings(buildings);
         }
-    }, [departments]);
-    useEffect(() => {
-        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-        tooltipTriggerList.forEach(el => new window.bootstrap.Tooltip(el));
-      }, []);
+    }, [buildings]);
   return (
     <>
 <div className="card shadow mb-4">
     <div className="card-header py-3 d-flex justify-content-between align-items-center">
-        <h6 className="m-0 font-weight-bold text-primary header-text">List of Department /
+        <h6 className="m-0 font-weight-bold text-primary header-text">List of Building /
             {
                 process=='IDLE' ?
-                <span className="text-secondary"> Search Department</span>
+                <span className="text-secondary"> Search Building</span>
                 :
                 process=='ADD' ?
-                <span className="text-secondary"> Add Department</span>
+                <span className="text-secondary"> Add Building</span>
                 :
-                <span className="text-secondary"> Update Department</span>
+                <span className="text-secondary"> Update Building</span>
             }
         </h6>
         {
             process=='IDLE' ?
             <button 
             className="btn btn-primary btn-sm"
-            data-bs-toggle="tooltip"
-            data-bs-placement="top"
-            title="Click to add department"
             onClick={()=>whatProcess('ADD')}
             >
                 <i className="fas fa-fw fa-plus normal-text"></i>
@@ -209,9 +202,6 @@ function Department() {
             <button 
             className="btn btn-danger btn-sm"
             onClick={()=>whatProcess('IDLE')}
-            data-bs-toggle="tooltip"
-            data-bs-placement="top"
-            title="Click to return to search"
             >
                 <i className="fas fa-fw fa-times normal-text"></i>
             </button>
@@ -254,22 +244,16 @@ function Department() {
                 <div className="col-md-3"> 
             
                 <button 
-                onClick={()=>searchDepartment()}
+                onClick={()=>searchBuilding()}
                 className="btn btn-primary btn-sm btn-header normal-text"
-                data-bs-toggle="tooltip"
-                data-bs-placement="top"
-                title="Click to search department"
                 > Search</button>
                 <button
                 onClick={() => {
-                    setFilteredDepartments(departments);
+                    setFilteredBuildings(buildings);
                     setSearch('');
                     setStartRow(0);
                     setRow(5);
                 }}
-                data-bs-toggle="tooltip"
-                data-bs-placement="top"
-                title="Click to reset search"
                 className="btn btn-secondary btn-sm btn-header normal-text ml-2"
             >
                 Reset
@@ -279,10 +263,10 @@ function Department() {
             :
             // Adding Data
             process=='ADD' ?
-            <AddDepartment/>
+            <AddBuilding/>
             :
             // Update
-            <UpdateDepartment departmentid={deptid}/>
+            <UpdateBuilding buildingid={deptid}/>
         }
 
            
@@ -307,7 +291,7 @@ function Department() {
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th>Department Name</th>
+                        <th>Building Name</th>
                         <th>Description</th>
                         <th>Date Added</th>
                         <th>Status</th>
@@ -317,18 +301,18 @@ function Department() {
                 </thead>
                 <tbody>
                     {
-                        filteredDepartments.map((item, index) => (
+                        filteredBuildings.map((item, index) => (
                             index>=startrow && index<row ?
                             <tr key={index}>
                                 <td>{index + 1}</td>
-                                <td>{item.department_name}</td>
+                                <td>{item.building_name}</td>
                                 <td>{item.description}</td>
                                 <td>{dateOnly(item.date_added)}</td>
                                 <td>{item.status}</td>
                                 <td className="d-flex justify-content-center" style={style}>
                                     <button 
                                     className="btn btn-warning btn-sm"
-                                    onClick={()=>getDepartmentId(item.id)}
+                                    onClick={()=>getBuildingId(item.id)}
                                     >
                                         <i className="fas fa-fw fa-edit"></i>
                                     </button>
@@ -336,14 +320,14 @@ function Department() {
                                         item.status=="ACTIVE" ?
                                             <button 
                                             className="btn btn-danger btn-sm"
-                                            onClick={()=>getRemoveDepartmentId(item.id)}
+                                            onClick={()=>getRemoveBuildingId(item.id)}
                                             >
                                                 <i className="fas fa-fw fa-trash"></i>
                                             </button>
                                         :
                                         <button 
                                         className="btn btn-info btn-sm"
-                                        onClick={()=>getRetrieveDepartmentId(item.id)}
+                                        onClick={()=>getRetrieveBuildingId(item.id)}
                                         >
                                             <i className="fas fa-fw fa-sync"></i>
                                         </button>
@@ -363,7 +347,7 @@ function Department() {
             <div className="w-100 d-flex justify-content-end border-1">
                 <div className="btn-group " role="group" aria-label="Basic example" >
                         {
-                        filteredDepartments ?
+                        filteredBuildings ?
                         <>
                          <button 
                         type="button" 
@@ -394,7 +378,7 @@ function Department() {
                         type="button" 
                         className="btn btn-primary "
                         onClick={()=>addRows()}
-                        disabled={startrow+5 >= filteredDepartments.length}
+                        disabled={startrow+5 >= filteredBuildings.length}
                         >
                             <i className="fas fa-caret-right normal-text"></i>
                         </button>
@@ -418,4 +402,4 @@ function Department() {
   )
 }
 
-export default Department
+export default Building

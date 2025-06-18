@@ -1,27 +1,27 @@
 import React from 'react'
 import {useState, useEffect} from 'react'
 import { toast} from 'react-toastify';
-import { useAddDepartmentsMutation } from '../../../rtk/departmentApi';
-function AddDepartment() {
-    const [addDepartment] = useAddDepartmentsMutation();
-    const [departmentname,setDepartmentName]  = useState('');
+import { useAddBuildingsMutation } from '../../../rtk/buildingApi';
+function AddBuilding() {
+    const [addBuilding] = useAddBuildingsMutation();
+    const [buildingname,setBuildingName]  = useState('');
     const [description,setDescription]  = useState('');
 
-    const submitDepartment=()=>{
-        if(departmentname === '' || description === ''){
+    const submitBuilding=()=>{
+        if(buildingname === '' || description === ''){
             toast.error("Please fill all fields");
             return;
         }
-        const department = {
-            department_name:departmentname,
+        const building = {
+            building_name:buildingname,
             description:description,
             status:'ACTIVE'
         }
-        addDepartment(department)
+        addBuilding(building)
         .unwrap()
         .then((res)=>{
-            toast.success("Department added successfully");
-            setDepartmentName('');
+            toast.success("Building added successfully");
+            setBuildingName('');
             setDescription('');
         })
         .catch((err)=>{
@@ -34,9 +34,9 @@ function AddDepartment() {
         <div className="form-group">
             <input type="text" 
             className="form-control normal-text"  
-            placeholder="Enter department name"
-            value={departmentname}
-            onChange={(e)=>setDepartmentName(e.target.value)}
+            placeholder="Enter building name"
+            value={buildingname}
+            onChange={(e)=>setBuildingName(e.target.value)}
             />
                 
         </div>
@@ -55,14 +55,12 @@ function AddDepartment() {
     <div className="col-md-3"> 
         <button 
         className="btn btn-primary btn-sm btn-header normal-text"
-        onClick={()=>submitDepartment()}
-        data-bs-toggle="tooltip"
-        data-bs-placement="top"
-        title="Click to submit new department"
+        onClick={()=>submitBuilding()}
+        
         > Add</button>
     </div>
     </>
   )
 }
 
-export default AddDepartment
+export default AddBuilding

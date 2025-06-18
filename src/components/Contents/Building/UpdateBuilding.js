@@ -1,30 +1,30 @@
 import React,{useState,useEffect} from 'react'
-import { useGetDepartmentQuery,useUpdateDepartmentsMutation } from '../../../rtk/departmentApi';
+import { useGetBuildingQuery,useUpdateBuildingsMutation } from '../../../rtk/buildingApi';
 import { toast} from 'react-toastify';
-function UpdateDepartment(props) {
+function UpdateBuilding(props) {
 
-    const {data} = useGetDepartmentQuery(props.departmentid);
-    const [departmentname,setDepartmentName]  = useState('');
+    const {data} = useGetBuildingQuery(props.buildingid);
+    const [buildingname,setBuildingName]  = useState('');
     const [description,setDescription]  = useState('');
 
-    const [updateDepartment] = useUpdateDepartmentsMutation();
+    const [updateBuilding] = useUpdateBuildingsMutation();
 
-    const submitDepartment =()=>{
-        if(departmentname === '' || description === ''){
+    const submitBuilding =()=>{
+        if(buildingname === '' || description === ''){
             toast.error("Please fill all fields");
             return;
         }
-        const department = {
+        const building = {
             id:data.id,
-            department_name:departmentname,
+            building_name:buildingname,
             description:description,
             status:data.status
         }
-        updateDepartment(department)
+        updateBuilding(building)
         .unwrap()
         .then((res)=>{
-            toast.success("Department updated successfully");
-            setDepartmentName('');
+            toast.success("Building updated successfully");
+            setBuildingName('');
             setDescription('');
         })
         .catch((err)=>{
@@ -35,7 +35,7 @@ function UpdateDepartment(props) {
     useEffect(()=>{
         if(data){
             console.log(data)
-            setDepartmentName(data.department_name)
+            setBuildingName(data.building_name)
             setDescription(data.description)
         }
     },[data])
@@ -45,9 +45,9 @@ function UpdateDepartment(props) {
         <div className="form-group">
             <input type="text" 
             className="form-control normal-text"  
-            placeholder="Enter department name"
-            value={departmentname}
-            onChange={(e)=>setDepartmentName(e.target.value)}
+            placeholder="Enter building name"
+            value={buildingname}
+            onChange={(e)=>setBuildingName(e.target.value)}
             />
                 
         </div>
@@ -66,14 +66,11 @@ function UpdateDepartment(props) {
             <div className="col-md-3"> 
                 <button 
                 className="btn btn-warning btn-sm btn-header normal-text"
-                onClick={()=>submitDepartment()}
-                data-bs-toggle="tooltip"
-                data-bs-placement="top"
-                title="Click to submit update."
+                onClick={()=>submitBuilding()}
                 > Update</button>
             </div>
     </>
   )
 }
 
-export default UpdateDepartment
+export default UpdateBuilding

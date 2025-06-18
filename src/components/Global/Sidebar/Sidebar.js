@@ -33,7 +33,7 @@ function Sidebar() {
         </li>
 
         <li className="nav-item">
-            <a className="nav-link" href="/">
+            <a className="nav-link" href="/forms">
                 <i className="fas fa-fw fa-file-contract"></i>
                 <span>Forms</span></a>
         </li>
@@ -67,9 +67,14 @@ function Sidebar() {
                 <span>Sections</span></a>
         </li>
         <li className="nav-item">
-            <a className="nav-link" href="/">
+            <a className="nav-link" href="/buildings">
                 <i className="fas fa-fw fa-building"></i>
                 <span>Buildings</span></a>
+        </li>
+        <li className="nav-item">
+            <a className="nav-link" href="/rooms">
+                <i className="fas fa-fw fa-door-open"></i>
+                <span>Rooms</span></a>
         </li>
 
       

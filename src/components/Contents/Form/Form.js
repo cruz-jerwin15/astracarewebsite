@@ -1,60 +1,60 @@
 'use client'
 import React from 'react'
 import {useState, useEffect} from 'react'
-import AddDepartment from '../Department/AddDepartment'
-import UpdateDepartment from '../Department/UpdateDepartment'
-import { useGetDepartmentsQuery,useUpdateDepartmentsStatusMutation } from '../../../rtk/departmentApi';
+import AddForm from '../Form/AddForm'
+import UpdateForm from '../Form/UpdateForm'
+import { useGetFormsQuery,useUpdateFormsStatusMutation } from '../../../rtk/formApi';
 import dateOnly from '../../../utils/getDate'
 import { toast} from 'react-toastify';
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; 
+import Link from 'next/link';
 
-
-function Department() {
-    const [filteredDepartments, setFilteredDepartments] = useState([]);
-    const [process,setProcess] =useState('IDLE');
+function Form(props) {
+    const [filteredForms, setFilteredForms] = useState([]);
+    const [process,setProcess] =useState('ADD');
     const [searchby,setSearchBy] =useState('name');
     const [search,setSearch] =useState('');
     const [row,setRow] = useState(5);
     const [startrow,setStartRow] = useState(0);
     const [deptid,setDeptId] = useState(0);
-    const {data:departments,isLoading,isError,isSuccess,error} = useGetDepartmentsQuery();
+    const {data:forms,isLoading,isError,isSuccess,error} = useGetFormsQuery();
 
-     const [updateDepartmentStatus] = useUpdateDepartmentsStatusMutation();
+     const [updateFormStatus] = useUpdateFormsStatusMutation();
 
-    const searchDepartment=()=>{
-        if (!departments) return;
+    const searchForm=()=>{
+        if (!forms) return;
 
-        let results = departments;
+        let results = forms;
     
         if (searchby === 'name') {
-            results = departments.filter(dep =>
-                dep.department_name.toLowerCase().includes(search.toLowerCase())
+            results = forms.filter(dep =>
+                dep.form_title.toLowerCase().includes(search.toLowerCase())
             );
         } else if (searchby === 'date') {
-            results = departments.filter(dep =>
+            results = forms.filter(dep =>
                 dateOnly(dep.date_added).includes(search)
             );
         }else{
-            results = departments.filter(dep =>
+            results = forms.filter(dep =>
                 dep.description.toLowerCase().includes(search.toLowerCase())
             );
             
         }
     
-        setFilteredDepartments(results);
+        setFilteredForms(results);
         setStartRow(0);
         setRow(5); // Reset pagination
     } 
     
-    const getRemoveDepartmentId=(id)=>{
+    const getRemoveFormId=(id)=>{
         confirmAlert({
             customUI: ({ onClose }) => {
                 return (
                   <div className='card shadow' style={{ padding: '20px', borderRadius: '10px', backgroundColor: '#f8d7da' }}>
-                    <h1 className="text-secondary header-text">Remove Department</h1>
+                    <h1 className="text-secondary header-text">Un-publish Form</h1>
                     <p className="text-secondary normal-text">
-                      Are you sure to remove this department from Active status?
+                      Are you sure to unpublish this form?
                     </p>
                     <div className="w-100 d-flex justify-content-between">
                         <button
@@ -63,11 +63,11 @@ function Department() {
                         <button
                         className="btn btn-danger normal-text"
                         onClick={() => {
-                            submitDepartmentStatus(id,'REMOVED')
+                            submitFormStatus(id,'DRAFT')
                             onClose();
                         }}
                         >
-                        Remove
+                        Un-publish
                         </button>
                     </div>
                     
@@ -77,14 +77,52 @@ function Department() {
           });
         
     }
-    const getRetrieveDepartmentId=(id)=>{
+    const getPublishFormId=(id)=>{
+
+        const publishExist = forms.some(form => form.status === "PUBLISHED");
+        if(publishExist){
+            toast.warning("We only allow one published form. We already have one published forms. Please un-publish it first.");
+        }else{
+            confirmAlert({
+                customUI: ({ onClose }) => {
+                    return (
+                      <div className='card shadow' style={{ padding: '20px', borderRadius: '10px', backgroundColor: '#f8d7da' }}>
+                        <h1 className="text-secondary header-text">Publish Form</h1>
+                        <p className="text-secondary normal-text">
+                          Are you sure to publish this form?
+                        </p>
+                        <div className="w-100 d-flex justify-content-between">
+                            <button
+                            className="btn btn-secondary normal-text"
+                            onClick={onClose}>Cancel</button>
+                            <button
+                            className="btn btn-primary normal-text"
+                            onClick={() => {
+                                submitFormStatus(id,'PUBLISHED')
+                                onClose();
+                            }}
+                            >
+                            Publish
+                            </button>
+                        </div>
+                        
+                      </div>
+                    );
+                  }
+              });
+        }
+
+       
+        
+    }
+    const getRetrieveFormId=(id)=>{
         confirmAlert({
             customUI: ({ onClose }) => {
                 return (
                   <div className='card shadow' style={{ padding: '20px', borderRadius: '10px', backgroundColor: '#f8d7da' }}>
-                    <h1 className="text-secondary header-text">Retrieve Department</h1>
+                    <h1 className="text-secondary header-text">Retrieve Form</h1>
                     <p className="text-secondary normal-text">
-                      Are you sure to retrieve this department from Removed status?
+                      Are you sure to retrieve this form from Removed status?
                     </p>
                     <div className="w-100 d-flex justify-content-between">
                         <button
@@ -93,7 +131,7 @@ function Department() {
                         <button
                         className="btn btn-info normal-text"
                         onClick={() => {
-                            submitDepartmentStatus(id,'ACTIVE')
+                            submitFormStatus(id,'ACTIVE')
                             onClose();
                         }}
                         >
@@ -107,18 +145,20 @@ function Department() {
           });
         
     }
-    const submitDepartmentStatus=(id,status)=>{
-        const department = {
+    const submitFormStatus=(id,status)=>{
+        const form = {
             id:id,
             status:status
         }
-        updateDepartmentStatus(department)
+        updateFormStatus(form)
         .unwrap()
         .then((res)=>{
-            if(status=='ACTIVE'){
-                toast.success("Department retrieved successfully");
+            if(status=='DRAFT'){
+                toast.success("Form unpublish successfully");
+            }else if(status=='PUBLISHED'){
+                toast.success("Form publish successfully");
             }else{
-                toast.success("Department removed successfully");
+                toast.success("Form removed successfully");
             }
             
                     
@@ -128,7 +168,7 @@ function Department() {
         })
     }
     
-    const getDepartmentId =(id)=>{
+    const getFormId =(id)=>{
         setProcess('UPDATE')
         console.log(id)
         setDeptId(id)
@@ -157,8 +197,8 @@ function Department() {
         gap:"1px"
     }
    
-    if(filteredDepartments){
-        let len = Math.ceil(filteredDepartments.length / 5);
+    if(filteredForms){
+        let len = Math.ceil(filteredForms.length / 5);
         var pageArray = [];
         for (var i = 0; i < len; i++) {
             pageArray.push(i);
@@ -171,47 +211,34 @@ function Department() {
         console.log("Start Row",row)
     },[startrow]);
     useEffect(() => {
-        if (departments) {
-            setFilteredDepartments(departments);
+        if (forms) {
+            setFilteredForms(forms);
         }
-    }, [departments]);
-    useEffect(() => {
-        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-        tooltipTriggerList.forEach(el => new window.bootstrap.Tooltip(el));
-      }, []);
+    }, [forms]);
+     useEffect(() => {
+            const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+            tooltipTriggerList.forEach(el => new window.bootstrap.Tooltip(el));
+          }, []);
   return (
     <>
 <div className="card shadow mb-4">
     <div className="card-header py-3 d-flex justify-content-between align-items-center">
-        <h6 className="m-0 font-weight-bold text-primary header-text">List of Department /
+       
             {
-                process=='IDLE' ?
-                <span className="text-secondary"> Search Department</span>
-                :
+              
                 process=='ADD' ?
-                <span className="text-secondary"> Add Department</span>
+                <h6 className="m-0 font-weight-bold text-primary header-text">Add Form</h6>
                 :
-                <span className="text-secondary"> Update Department</span>
+                <h6 className="m-0 font-weight-bold text-primary header-text">Update Form </h6>
             }
-        </h6>
+    
         {
-            process=='IDLE' ?
-            <button 
-            className="btn btn-primary btn-sm"
-            data-bs-toggle="tooltip"
-            data-bs-placement="top"
-            title="Click to add department"
-            onClick={()=>whatProcess('ADD')}
-            >
-                <i className="fas fa-fw fa-plus normal-text"></i>
-            </button>
+            process=='ADD' ?
+           <></>
             :
             <button 
             className="btn btn-danger btn-sm"
-            onClick={()=>whatProcess('IDLE')}
-            data-bs-toggle="tooltip"
-            data-bs-placement="top"
-            title="Click to return to search"
+            onClick={()=>whatProcess('ADD')}
             >
                 <i className="fas fa-fw fa-times normal-text"></i>
             </button>
@@ -224,65 +251,13 @@ function Department() {
         <div className="row" >
 
         {
-            // Search
-            process=='IDLE' ? 
-            <>
-                <div className="col-md-3">
-                    <div className="form-group">
-                    
-                        <select 
-                        onChange={(e)=>setSearchBy(e.target.value)}
-                        value={searchby}
-                        className="form-control normal-text" >
-                        <option value="name"> Search by Name</option>
-                        <option value="date">Search by Date Added</option>
-                        <option value="description">Search by Description</option>
-                    
-                        </select>
-                    </div>
-                </div>
-                <div className="col-md-6">
-                    <div className="form-group">
-                        <input type="text" 
-                        className="form-control normal-text"
-                        value={search}
-                        onChange={(e)=>setSearch(e.target.value)}
-                         placeholder="Enter your search" />
-                
-                    </div>
-                </div>
-                <div className="col-md-3"> 
-            
-                <button 
-                onClick={()=>searchDepartment()}
-                className="btn btn-primary btn-sm btn-header normal-text"
-                data-bs-toggle="tooltip"
-                data-bs-placement="top"
-                title="Click to search department"
-                > Search</button>
-                <button
-                onClick={() => {
-                    setFilteredDepartments(departments);
-                    setSearch('');
-                    setStartRow(0);
-                    setRow(5);
-                }}
-                data-bs-toggle="tooltip"
-                data-bs-placement="top"
-                title="Click to reset search"
-                className="btn btn-secondary btn-sm btn-header normal-text ml-2"
-            >
-                Reset
-            </button>
-                </div>
-            </>
-            :
+           
             // Adding Data
             process=='ADD' ?
-            <AddDepartment/>
+            <AddForm/>
             :
             // Update
-            <UpdateDepartment departmentid={deptid}/>
+            <UpdateForm formid={deptid}/>
         }
 
            
@@ -307,8 +282,7 @@ function Department() {
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th>Department Name</th>
-                        <th>Description</th>
+                        <th>Title</th>
                         <th>Date Added</th>
                         <th>Status</th>
                         <th>Action</th>
@@ -317,36 +291,89 @@ function Department() {
                 </thead>
                 <tbody>
                     {
-                        filteredDepartments.map((item, index) => (
+                        filteredForms.map((item, index) => (
                             index>=startrow && index<row ?
                             <tr key={index}>
                                 <td>{index + 1}</td>
-                                <td>{item.department_name}</td>
-                                <td>{item.description}</td>
+                                <td>{item.form_title}</td>
                                 <td>{dateOnly(item.date_added)}</td>
                                 <td>{item.status}</td>
                                 <td className="d-flex justify-content-center" style={style}>
-                                    <button 
-                                    className="btn btn-warning btn-sm"
-                                    onClick={()=>getDepartmentId(item.id)}
-                                    >
-                                        <i className="fas fa-fw fa-edit"></i>
-                                    </button>
+                                   
                                     {
-                                        item.status=="ACTIVE" ?
-                                            <button 
-                                            className="btn btn-danger btn-sm"
-                                            onClick={()=>getRemoveDepartmentId(item.id)}
+                                        
+                                        item.status=="DRAFT" ?
+                                        <>
+                                         <Link 
+                                            className="btn btn-primary btn-sm"
+                                            data-bs-toggle="tooltip"
+                                            data-bs-placement="top"
+                                            title="Click to add question."
+                                            href={`/forms/${item.form_key}`}
                                             >
-                                                <i className="fas fa-fw fa-trash"></i>
+                                                <i className="fas fa-fw fa-plus-square"></i>
+                                            </Link>
+                                         <button 
+                                            className="btn btn-warning btn-sm"
+                                            onClick={()=>getFormId(item.id)}
+                                            data-bs-toggle="tooltip"
+                                            data-bs-placement="top"
+                                            title="Click to update forms."
+                                            >
+                                                <i className="fas fa-fw fa-edit"></i>
                                             </button>
+                                            <button 
+                                            className="btn btn-success btn-sm"
+                                            onClick={()=>getPublishFormId(item.id)}
+                                            data-bs-toggle="tooltip"
+                                            data-bs-placement="top"
+                                            title="Click to publish forms."
+                                            >
+                                                <i className="fas fa-fw fa-check"></i>
+                                            </button>
+                                        </>
+                                        : 
+                                        item.status=="PUBLISHED" ?
+                                        <>
+                                        <button 
+                                            className="btn btn-primary btn-sm" disabled
+                                            >
+                                                <i className="fas fa-fw fa-plus-square"></i>
+                                            </button>
+                                        <button 
+                                            className="btn btn-warning btn-sm" disabled
+                                            >
+                                                <i className="fas fa-fw fa-edit"></i>
+                                            </button>
+                                        <button 
+                                        className="btn btn-danger btn-sm"
+                                        onClick={()=>getRemoveFormId(item.id)}
+                                        data-bs-toggle="tooltip"
+                                        data-bs-placement="top"
+                                        title="Click to un-publish form."
+                                        >
+                                            <i className="fas fa-fw fa-trash"></i>
+                                        </button>
+                                        </>
                                         :
+                                        <>
+                                        <button 
+                                            className="btn btn-primary btn-sm" disabled
+                                            >
+                                                <i className="fas fa-fw fa-plus-square"></i>
+                                            </button>
+                                        <button 
+                                            className="btn btn-warning btn-sm" disabled
+                                            >
+                                                <i className="fas fa-fw fa-edit"></i>
+                                            </button>
                                         <button 
                                         className="btn btn-info btn-sm"
-                                        onClick={()=>getRetrieveDepartmentId(item.id)}
+                                        onClick={()=>getRetrieveFormId(item.id)}
                                         >
                                             <i className="fas fa-fw fa-sync"></i>
                                         </button>
+                                        </>
                                     }
                                    
                                 </td>
@@ -363,7 +390,7 @@ function Department() {
             <div className="w-100 d-flex justify-content-end border-1">
                 <div className="btn-group " role="group" aria-label="Basic example" >
                         {
-                        filteredDepartments ?
+                        filteredForms ?
                         <>
                          <button 
                         type="button" 
@@ -394,7 +421,7 @@ function Department() {
                         type="button" 
                         className="btn btn-primary "
                         onClick={()=>addRows()}
-                        disabled={startrow+5 >= filteredDepartments.length}
+                        disabled={startrow+5 >= filteredForms.length}
                         >
                             <i className="fas fa-caret-right normal-text"></i>
                         </button>
@@ -418,4 +445,4 @@ function Department() {
   )
 }
 
-export default Department
+export default Form

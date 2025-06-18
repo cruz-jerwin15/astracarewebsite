@@ -26,7 +26,7 @@ export default function RootLayout({ children }) {
   integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="
   crossOrigin="anonymous"
 ></script>
-        <script src="/bootstrap/js/sb-admin-2.min.js"></script>
+        
         <script src="/bootstrap/vendor/jquery/jquery.min.js"></script>
         <script src="/bootstrap/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   
