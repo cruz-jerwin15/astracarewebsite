@@ -8,9 +8,12 @@ import dateOnly from '../../../utils/getDate'
 import { toast} from 'react-toastify';
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; 
-
+import QRCode from 'qrcode';
+import { jsPDF } from 'jspdf';
 
 function Room() {
+    const [qrValue, setQrValue] = useState('0');
+    const [loading, setLoading] = useState(false);
     const [filteredBuildings, setFilteredBuildings] = useState([]);
     const [process,setProcess] =useState('IDLE');
     const [searchby,setSearchBy] =useState('name');
@@ -22,6 +25,34 @@ function Room() {
     
 
      const [updateRoomStatus] = useUpdateRoomsStatusMutation();
+
+     const generatePDF = async (roomkey,roomname,build) => {
+        setLoading(true);
+        try {
+          // Generate QR Code as base64
+          const qrDataUrl = await QRCode.toDataURL(roomkey);
+    
+          // Create a new PDF
+          const pdf = new jsPDF();
+    
+          // Add title or text
+          pdf.setFontSize(16);
+          pdf.text(`Room: ${roomname}`, 20, 20);
+          pdf.text(`Building: ${build}`, 20, 30);
+    
+          // Add QR Code image
+          pdf.addImage(qrDataUrl, 'PNG', 20, 50, 170, 170);
+    
+          // Display the PDF in a new window
+          const pdfBlob = pdf.output('blob');
+          const pdfUrl = URL.createObjectURL(pdfBlob);
+          window.open(pdfUrl, '_blank');
+        } catch (error) {
+          console.error('Failed to generate PDF:', error);
+        } finally {
+          setLoading(false);
+        }
+      };
 
     const searchBuilding=()=>{
         if (!rooms) return;
@@ -323,19 +354,35 @@ function Room() {
                                     </button>
                                     {
                                         item.status=="ACTIVE" ?
+                                        <>
+                                         <button 
+                                            className="btn btn-success btn-sm"
+                                            onClick={()=>generatePDF(item.room_key,item.room_name,item.building_name)}
+                                            >
+                                                <i className="fas fa-fw fa-qrcode"></i>
+                                            </button>
                                             <button 
                                             className="btn btn-danger btn-sm"
                                             onClick={()=>getRemoveBuildingId(item.id)}
                                             >
                                                 <i className="fas fa-fw fa-trash"></i>
                                             </button>
+                                        </>
+                                          
                                         :
+                                        <>
+                                        <button 
+                                        className="btn btn-success btn-sm" disabled
+                                        >
+                                            <i className="fas fa-fw fa-qrcode"></i>
+                                        </button>
                                         <button 
                                         className="btn btn-info btn-sm"
                                         onClick={()=>getRetrieveBuildingId(item.id)}
                                         >
                                             <i className="fas fa-fw fa-sync"></i>
                                         </button>
+                                        </>
                                     }
                                    
                                 </td>

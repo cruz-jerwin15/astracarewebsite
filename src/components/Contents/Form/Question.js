@@ -63,7 +63,7 @@ function Question(props) {
     </div>
   
     <div className="card-body">
-    <div className="container">
+    {/* <div className="container"> */}
         <div className="row" >
 
         {
@@ -78,7 +78,7 @@ function Question(props) {
 
            
         </div>
-    </div>
+    {/* </div> */}
     
     
    

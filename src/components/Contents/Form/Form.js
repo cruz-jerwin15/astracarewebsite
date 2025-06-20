@@ -247,7 +247,7 @@ function Form(props) {
     </div>
   
     <div className="card-body">
-    <div className="container">
+    {/* <div className="container"> */}
         <div className="row" >
 
         {
@@ -262,7 +262,7 @@ function Form(props) {
 
            
         </div>
-    </div>
+    {/* </div> */}
     
     
    
