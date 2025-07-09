@@ -11,11 +11,11 @@ export const formApi = createApi({
             }),
             
             getForm:builder.query({
-                query:(id)=>`/forms/${id}`,
+                query:(id)=>`/forms/id/${id}`,
                 providesTags:["Form"]
             }),
             getFormKey:builder.query({
-                query:(id)=>`/forms/id/${id}`,
+                query:(id)=>`/forms/key/${id}`,
                 providesTags:["Form"]
             }),
             addForms:builder.mutation({
