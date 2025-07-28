@@ -1,6 +1,8 @@
-import React from 'react'
+'use client'
+import React,{useState,useEffect} from 'react'
 import Link from 'next/link';
 function Sidebar() {
+
   return (
     <>
 <ul className="navbar-nav bg-gradient-danger sidebar sidebar-dark accordion" id="accordionSidebar">
@@ -27,7 +29,7 @@ function Sidebar() {
 
 
         <li className="nav-item">
-            <a className="nav-link" href="/">
+            <a className="nav-link" href="/users">
                 <i className="fas fa-fw fa-users"></i>
                 <span>Users</span></a>
         </li>

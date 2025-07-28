@@ -1,7 +1,8 @@
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react'
+import {localServer} from './localServer';
 export const sectionApi = createApi({
     reducerPath:"sectionApi",
-    baseQuery:fetchBaseQuery({baseUrl:"http://localhost:8000/api"}),
+    baseQuery:fetchBaseQuery({baseUrl:localServer}),
     tagTypes:["Section"],
     endpoints:(builder)=>(
         {

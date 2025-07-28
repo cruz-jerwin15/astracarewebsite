@@ -7,6 +7,7 @@ import { roomApi } from "./roomApi";
 import { formApi } from "./formApi";
 import { questionApi } from "./questionApi";
 import { optionApi } from "./optionApi";
+import { userApi } from "./userApi";
 
 
 export const store = configureStore({
@@ -18,7 +19,8 @@ export const store = configureStore({
         [roomApi.reducerPath]: roomApi.reducer,
         [formApi.reducerPath]: formApi.reducer,
         [questionApi.reducerPath]: questionApi.reducer,
-        [optionApi.reducerPath]: optionApi.reducer
+        [optionApi.reducerPath]: optionApi.reducer,
+        [userApi.reducerPath]: userApi.reducer
         
 
     },
@@ -30,5 +32,6 @@ export const store = configureStore({
     .concat(roomApi.middleware)
     .concat(formApi.middleware)
     .concat(questionApi.middleware)
-    .concat(optionApi.middleware),
+    .concat(optionApi.middleware)
+    .concat(userApi.middleware),
 });

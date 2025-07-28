@@ -1,6 +1,15 @@
-import React from 'react'
 
+'use client'
+import React,{useState,useEffect} from 'react'
 function Header() {
+    const [name,setName] = useState('')
+
+useEffect(()=>{
+    const user = JSON.parse(localStorage.getItem('user'));
+    if(user){
+        setName(`${user.firstname} ${user.lastname}`);
+    }
+},[])
   return (
     <>
      <nav className="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
@@ -97,7 +106,7 @@ function Header() {
     <li className="nav-item dropdown no-arrow">
         <a className="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <span className="mr-2 d-none d-lg-inline text-gray-600 small">Juan Dela Cruz</span>
+            <span className="mr-2 d-none d-lg-inline text-gray-600 small">{name}</span>
             <img className="img-profile rounded-circle"
                 src="/bootstrap/img/undraw_profile.svg" />
         </a>

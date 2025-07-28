@@ -1,7 +1,9 @@
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react'
+import {localServer} from './localServer';
 export const buildingApi = createApi({
     reducerPath:"buildingApi",
-    baseQuery:fetchBaseQuery({baseUrl:"http://localhost:8000/api"}),
+    // baseQuery:fetchBaseQuery({baseUrl:"http://localhost:8000/api"}),
+    baseQuery:fetchBaseQuery({baseUrl:localServer}),
     tagTypes:["Building"],
     endpoints:(builder)=>(
         {
